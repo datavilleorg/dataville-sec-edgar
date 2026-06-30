@@ -1,0 +1,17 @@
+@import url("https://use.typekit.net/zqm2cdu.css");
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-primary: #EE3625;
+  --color-pink: #FFB1C5;
+  --color-cream: #FFF7EF;
+  --color-maroon: #5B1A1D;
+}
+
+body {
+  color: var(--color-maroon);
+  background-color: var(--color-cream);
+}
