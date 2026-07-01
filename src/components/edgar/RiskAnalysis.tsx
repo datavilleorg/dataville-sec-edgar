@@ -1,9 +1,9 @@
 'use client';
 
-import { useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { EdgarData, CompanyEntry } from '@/types/edgar';
 import { computeRiskScore, getRiskLevel, RiskSignal, RiskScore } from '@/lib/riskAnalysis';
-import { FiAlertTriangle, FiShield, FiTrendingDown } from 'react-icons/fi';
+import { FiAlertTriangle, FiShield, FiTrendingDown, FiChevronDown, FiChevronUp, FiInfo } from 'react-icons/fi';
 
 interface RiskAnalysisProps {
   data: EdgarData | null;
@@ -33,13 +33,13 @@ function CategoryIcon({ category }: { category: RiskSignal['category'] }) {
   }
 }
 
-function ScoreBar({ label, score }: { label: string; score: number }) {
+function ScoreBar({ label, score, weight }: { label: string; score: number; weight: string }) {
   const level = getRiskLevel(score);
   return (
     <div className="space-y-1">
       <div className="flex items-center justify-between text-xs">
-        <span className="text-maroon/70">{label}</span>
-        <span className={`font-medium ${level.color}`}>{score}</span>
+        <span className="text-maroon/70">{label} <span className="text-maroon/40">({weight})</span></span>
+        <span className={`font-medium ${level.color}`}>{score} / 100</span>
       </div>
       <div className="h-1.5 rounded-full bg-maroon/10 overflow-hidden">
         <div
@@ -49,6 +49,134 @@ function ScoreBar({ label, score }: { label: string; score: number }) {
           style={{ width: `${score}%` }}
         />
       </div>
+    </div>
+  );
+}
+
+function Methodology() {
+  const [expanded, setExpanded] = useState(false);
+
+  return (
+    <div className="mt-5 pt-4 border-t border-maroon/10">
+      <button
+        onClick={() => setExpanded(!expanded)}
+        className="flex items-center gap-1.5 text-xs font-medium text-maroon hover:underline"
+      >
+        <FiInfo className="h-3 w-3" />
+        How is risk calculated?
+        {expanded ? <FiChevronUp className="h-3 w-3" /> : <FiChevronDown className="h-3 w-3" />}
+      </button>
+
+      {expanded && (
+        <div className="mt-3 space-y-4 text-xs text-maroon/70 leading-relaxed">
+          <div>
+            <h4 className="font-semibold text-maroon text-[11px] uppercase tracking-widest mb-1.5">Overall score</h4>
+            <p>
+              The risk score ranges from 0 (lowest risk) to 100 (highest risk), computed as a weighted
+              blend of three components: <strong className="text-maroon">Financial Health (40%)</strong>,{' '}
+              <strong className="text-maroon">Insider Activity (35%)</strong>, and{' '}
+              <strong className="text-maroon">Filing Patterns (25%)</strong>.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-4">
+            <div className="rounded-lg border border-maroon/10 p-3">
+              <h4 className="font-semibold text-maroon text-[11px] uppercase tracking-widest mb-2">
+                Financial Health (40%)
+              </h4>
+              <p className="mb-2">Derived from XBRL financial data filed with the SEC:</p>
+              <ul className="space-y-1.5">
+                {[
+                  ['Negative equity', '+30 pts', 'Liabilities exceed assets'],
+                  ['Net loss', '+25 pts', 'Net income is negative'],
+                  ['Negative operating income', '+20 pts', 'Core operations unprofitable'],
+                  ['High leverage (D/E > 3x)', '+20 pts', 'Debt-to-equity exceeds 3x'],
+                  ['Elevated leverage (D/E > 2x)', '+10 pts', 'Debt-to-equity exceeds 2x'],
+                  ['Thin profit margin (<2%)', '+10 pts', 'Net margin under 2%'],
+                ].map(([signal, pts, desc]) => (
+                  <li key={signal} className="flex gap-2">
+                    <span className="text-red-600 font-mono text-[10px] w-12 flex-shrink-0 text-right">{pts}</span>
+                    <span><span className="font-medium text-maroon">{signal}</span> — {desc}</span>
+                  </li>
+                ))}
+                {[
+                  ['Profitable + no signals', '-10 pts', 'Positive signal, reduces score'],
+                ].map(([signal, pts, desc]) => (
+                  <li key={signal} className="flex gap-2">
+                    <span className="text-green-600 font-mono text-[10px] w-12 flex-shrink-0 text-right">{pts}</span>
+                    <span><span className="font-medium text-maroon">{signal}</span> — {desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-maroon/10 p-3">
+              <h4 className="font-semibold text-maroon text-[11px] uppercase tracking-widest mb-2">
+                Insider Activity (35%)
+              </h4>
+              <p className="mb-2">Derived from SEC Form 4 insider transaction filings:</p>
+              <ul className="space-y-1.5">
+                {[
+                  ['Multiple insiders selling', '+25 pts', '3+ different insiders sold shares'],
+                  ['Large officer sale(s)', '+20 pts', 'Officer sale(s) exceeding $1M'],
+                  ['Sell-only activity', '+15 pts', 'Insider sales with no purchases'],
+                ].map(([signal, pts, desc]) => (
+                  <li key={signal} className="flex gap-2">
+                    <span className="text-red-600 font-mono text-[10px] w-12 flex-shrink-0 text-right">{pts}</span>
+                    <span><span className="font-medium text-maroon">{signal}</span> — {desc}</span>
+                  </li>
+                ))}
+                {[
+                  ['Net insider buying', '-10 pts', 'More purchases than sales — positive signal'],
+                ].map(([signal, pts, desc]) => (
+                  <li key={signal} className="flex gap-2">
+                    <span className="text-green-600 font-mono text-[10px] w-12 flex-shrink-0 text-right">{pts}</span>
+                    <span><span className="font-medium text-maroon">{signal}</span> — {desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            <div className="rounded-lg border border-maroon/10 p-3">
+              <h4 className="font-semibold text-maroon text-[11px] uppercase tracking-widest mb-2">
+                Filing Patterns (25%)
+              </h4>
+              <p className="mb-2">Derived from SEC filing metadata and behavior:</p>
+              <ul className="space-y-1.5">
+                {[
+                  ['Late filing notice (NT)', '+30 pts', 'Company unable to file on time'],
+                  ['Amended filing (/A)', '+25 pts', 'Possible restatement or correction'],
+                  ['Frequent 8-K filings', '+10 pts', '5+ material event reports'],
+                  ['High Form 4 volume', '+5 pts', '10+ insider transaction reports'],
+                ].map(([signal, pts, desc]) => (
+                  <li key={signal} className="flex gap-2">
+                    <span className="text-red-600 font-mono text-[10px] w-12 flex-shrink-0 text-right">{pts}</span>
+                    <span><span className="font-medium text-maroon">{signal}</span> — {desc}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-3 gap-3">
+            {[
+              ['Low Risk', '0 – 29', 'bg-green-100 text-green-800 border-green-200'],
+              ['Medium Risk', '30 – 59', 'bg-amber-100 text-amber-800 border-amber-200'],
+              ['High Risk', '60 – 100', 'bg-red-100 text-red-800 border-red-200'],
+            ].map(([label, range, cls]) => (
+              <div key={label} className={`rounded-lg border p-2.5 text-center ${cls}`}>
+                <p className="font-semibold text-[11px]">{label}</p>
+                <p className="text-[10px] mt-0.5 opacity-80">Score {range}</p>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-[11px] text-maroon/40 italic">
+            This is an automated heuristic score based on publicly available SEC filings, XBRL financial data, and
+            insider transaction reports. It is not investment advice. Individual signals are additive and capped at 100 per component.
+          </p>
+        </div>
+      )}
     </div>
   );
 }
@@ -142,9 +270,9 @@ export default function RiskAnalysis({ data, companies, isLoading }: RiskAnalysi
 
           {/* Category scores */}
           <div className="space-y-3 mb-5">
-            <ScoreBar label="Financial Health" score={risk.financial} />
-            <ScoreBar label="Insider Activity" score={risk.insider} />
-            <ScoreBar label="Filing Patterns" score={risk.filing} />
+            <ScoreBar label="Financial Health" score={risk.financial} weight="40%" />
+            <ScoreBar label="Insider Activity" score={risk.insider} weight="35%" />
+            <ScoreBar label="Filing Patterns" score={risk.filing} weight="25%" />
           </div>
 
           {/* Signals */}
@@ -174,6 +302,9 @@ export default function RiskAnalysis({ data, companies, isLoading }: RiskAnalysi
 
           {/* Cross-company ranking */}
           <CompanyRiskSummary companies={companies} />
+
+          {/* Methodology */}
+          <Methodology />
         </div>
       )}
     </div>
