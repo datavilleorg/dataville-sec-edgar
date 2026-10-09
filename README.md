@@ -30,8 +30,8 @@ A standalone demo app that analyzes SEC EDGAR filings using the [Dataville API](
 ### Install and run
 
 ```bash
-git clone https://github.com/datavilleorg/dataville-sec-filing-analyzer.git
-cd dataville-sec-filing-analyzer
+git clone https://github.com/datavilleorg/dataville-sec-edgar.git
+cd dataville-sec-edgar
 npm install
 npm run dev
 ```
@@ -99,7 +99,7 @@ The risk score ranges from 0 (lowest) to 100 (highest), computed as:
 
 - [Dataville API](https://app.dataville.com) — the API powering this demo
 - [dataville-news-sentiment-tracker](https://github.com/datavilleorg/dataville-news-sentiment-tracker) — political news sentiment analysis demo
-- [dataville-wiki-data-stream](https://github.com/datavilleorg/dataville-wiki-data-stream) — Wikipedia knowledge base tracker demo
+- [dataville-wikimedia](https://github.com/datavilleorg/dataville-wikimedia) — build with Wikimedia data through Dataville
 
 ## License
 
