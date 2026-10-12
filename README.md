@@ -177,17 +177,19 @@ A Next.js filing analyzer for eight companies (AAPL, MSFT, GOOGL, AMZN, TSLA, NV
 git clone https://github.com/datavilleorg/dataville-sec-edgar.git
 cd dataville-sec-edgar
 npm install
+cp .env.example .env.local   # add DATAVILLE_API_KEY (recommended)
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000).
 
 - **Company search** looks up any SEC registrant by ticker or name.
-- **Financials** shows the XBRL figures from the Dataville response.
-- **Filing timeline and recent filings** show filing activity across the tracked companies.
-- **Risk analysis** is a score computed in the browser from the financials (60%) and filing patterns (40%); see [below](#risk-scoring).
+- **Financials** shows the XBRL figures and the filing and period they come from.
+- **Insider transactions** lists recent Form 4 trades. Form 4 only records whether shares were *acquired* or *disposed of*, so an "Acquired" row may be a purchase, a grant or an option exercise.
+- **Filing timeline and recent filings** show filing activity, with links to each SEC document.
+- **Risk analysis** is a score computed in the browser; see [below](#risk-scoring).
 
-Every value comes from Dataville's `/edgar/{ticker}` endpoint; the app makes no direct calls to the SEC. Each page load looks up 8 companies, so without a key it uses 8 of the 50-a-day anonymous allowance.
+The browser never calls Dataville directly. It calls the app's own route, [`src/app/api/edgar/[query]/route.ts`](src/app/api/edgar/%5Bquery%5D/route.ts), which calls `api.dataville.com` server-side, so your key never reaches the browser. The app makes no direct calls to the SEC. The route caches each company for 10 minutes and, because the app lets visitors search any company, caps lookups at 30 per visitor every 10 minutes (`EDGAR_LOOKUPS_PER_WINDOW`). That protects your key if you deploy the demo publicly. Each page load looks up 8 companies, so without a key it uses 8 of the 50-a-day anonymous allowance.
 
 **Stack:** [Next.js 14](https://nextjs.org/) (App Router), [Tailwind CSS](https://tailwindcss.com/), and the [Dataville API](https://app.dataville.com).
 
@@ -195,34 +197,40 @@ Every value comes from Dataville's `/edgar/{ticker}` endpoint; the app makes no 
 
 ```
 src/
-├── app/page.tsx              # Main page
-├── components/edgar/         # CompanySearch, CompanyFinancials, FilingTimeline,
-│                             # InsiderTransactions, RecentFilings, RiskAnalysis
-├── hooks/useEdgarData.ts     # Data fetching and state
-├── lib/edgarData.ts          # Dataville API client with caching
-├── lib/riskAnalysis.ts       # Risk scoring
-└── types/edgar.ts            # TypeScript interfaces
-examples/                     # API quickstarts (Python, Node)
+├── app/page.tsx                  # Main page
+├── app/api/edgar/[query]/route.ts  # Server-side call to the Dataville API
+├── components/edgar/             # CompanySearch, CompanyFinancials, FilingTimeline,
+│                                 # InsiderTransactions, RecentFilings, RiskAnalysis
+├── hooks/useEdgarData.ts         # Data loading and state
+├── lib/edgarData.ts              # API client: maps the Dataville response for the components
+├── lib/riskAnalysis.ts           # Risk scoring
+└── types/edgar.ts                # API and app types
+examples/                         # API quickstarts (Python, Node)
 ```
 
 ### Risk scoring
 
-A demo heuristic, not investment advice. The score runs from 0 (lowest risk) to 100 (highest):
+A demo heuristic, not investment advice. Each component scores 0–100 (signals add up, capped at 100), and the overall score weights them:
 
-**Financial health (60% weight)**, from the XBRL figures:
-- Net loss → +20 pts
-- Negative operating income → +15 pts
-- High leverage (D/E > 3x) → +20 pts
-- Negative equity → +25 pts
-- Thin profit margin (<2%) → +8 pts
-- Low cash reserves → +10 pts
+**Financial health (40%)**, from the XBRL figures:
+- Negative stockholders' equity → +30
+- Net loss → +25
+- Negative operating income → +20
+- High leverage (debt-to-equity over 3x) → +20, or elevated (over 2x) → +10
+- Thin profit margin (under 2%) → +10
+- Profitable with no other signals → −10
 
-**Filing patterns (40% weight)**, from filing metadata:
-- Late filing notice (NT form) → +30 pts
-- Amended filing → +25 pts
-- Late filing (>75 day gap) → +15 pts
-- 8-K current report → +10 pts
-- Non-accelerated filer → +5 pts
+**Insider activity (35%)**, from Form 4 trades:
+- Three or more insiders disposing of shares → +25
+- Officer disposals over $1M → +20
+- Disposals with no acquisitions → +15
+- More acquisitions than disposals (at least two) → −10
+
+**Filing patterns (25%)**, from recent filings:
+- Late filing notice (NT form) → +30
+- Amended filing (/A) → +25
+- Five or more 8-Ks → +10
+- Ten or more Form 4s → +5
 
 | Level | Score range |
 |-------|------------|

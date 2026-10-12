@@ -16,7 +16,7 @@ export default function InsiderTransactions({ data, isLoading }: InsiderTransact
       <div className="mb-4">
         <h2 className="text-lg font-bold text-maroon">Insider Transactions</h2>
         <p className="text-xs text-maroon/50 mt-1">
-          Form 4 filings — officer and director trades
+          Form 4 filings — officer and director trades. &ldquo;Acquired&rdquo; may be a purchase, grant or option exercise.
         </p>
       </div>
 
@@ -31,7 +31,7 @@ export default function InsiderTransactions({ data, isLoading }: InsiderTransact
       ) : (
         <div className="max-h-[320px] overflow-y-auto space-y-3 pr-1">
           {transactions.slice(0, 20).map((txn, i) => {
-            const isBuy = txn.transactionCode === 'P';
+            const isBuy = txn.transactionCode === 'A';
             return (
               <div key={i} className="py-2 border-b border-maroon/5 last:border-0">
                 <div className="flex items-start justify-between gap-2">

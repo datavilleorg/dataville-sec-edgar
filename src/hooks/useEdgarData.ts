@@ -27,12 +27,14 @@ export function useEdgarCompanies() {
       ? globalCompanies
       : [...globalCompanies, { ticker, name, data: null, loading: true, error: null }];
 
-    const data = await fetchEdgarData(ticker);
+    const result = await fetchEdgarData(ticker);
+    const data = 'data' in result ? result.data : null;
+    const error = 'error' in result ? result.error : null;
 
     const update = (prev: CompanyEntry[]) =>
       prev.map(c =>
         c.ticker === ticker
-          ? { ...c, data, name: data?.metadata?.company_info?.name || name, loading: false, error: data ? null : 'Failed to load' }
+          ? { ...c, data, name: data?.metadata.company_info.name || name, loading: false, error }
           : c
       );
 
