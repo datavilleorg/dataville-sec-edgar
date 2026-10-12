@@ -4,7 +4,7 @@
 
 This repo shows how to use SEC EDGAR data through [Dataville](https://dataville.com): a 60-second API quickstart, an MCP example for agents, and a runnable filing analyzer with financials and risk scoring.
 
-[Get a free API key](https://app.dataville.com/api-keys) · [API docs](https://app.dataville.com) · [Dataville MCP](https://github.com/datavilleorg/dataville-mcp) · [Live demo](https://app.dataville.com/use-cases/sec-filing-analyzer)
+[Get a free API key](https://app.dataville.com/api-keys) · [Docs](https://docs.dataville.com) · [API reference](https://docs.dataville.com/api-reference/overview) · [Dataville MCP](https://github.com/datavilleorg/dataville-mcp) · [Live demo](https://app.dataville.com/use-cases/sec-filing-analyzer)
 
 ```
 SEC EDGAR ──────────▶ Dataville ──────────────▶ one JSON response per company ──▶ your app
@@ -191,7 +191,7 @@ Open [http://localhost:3000](http://localhost:3000).
 
 The browser never calls Dataville directly. It calls the app's own route, [`src/app/api/edgar/[query]/route.ts`](src/app/api/edgar/%5Bquery%5D/route.ts), which calls `api.dataville.com` server-side, so your key never reaches the browser. The app makes no direct calls to the SEC. The route caches each company for 10 minutes and, because the app lets visitors search any company, caps lookups at 30 per visitor every 10 minutes (`EDGAR_LOOKUPS_PER_WINDOW`). That protects your key if you deploy the demo publicly. Each page load looks up 8 companies, so without a key it uses 8 of the 50-a-day anonymous allowance.
 
-**Stack:** [Next.js 14](https://nextjs.org/) (App Router), [Tailwind CSS](https://tailwindcss.com/), and the [Dataville API](https://app.dataville.com).
+**Stack:** [Next.js 14](https://nextjs.org/) (App Router), [Tailwind CSS](https://tailwindcss.com/), and the [Dataville API](https://docs.dataville.com).
 
 ### Project structure
 
@@ -250,6 +250,17 @@ curl "https://api.dataville.com/wiki/Nvidia"   # context: history, products, peo
 ```
 
 See [`company-intelligence-agent`](https://github.com/datavilleorg/company-intelligence-agent) for a full example that keeps each claim tagged with its source, and [`dataville-wikimedia`](https://github.com/datavilleorg/dataville-wikimedia) for the Wikimedia package.
+
+## Learn more
+
+Step-by-step guides built on the same EDGAR data:
+
+- [Monitor SEC filings for a watchlist](https://docs.dataville.com/guides/filings-watchlist)
+- [Profile a client's competitors from Claude and Data Studio](https://docs.dataville.com/guides/competitor-scan)
+- [Check business applications against SEC filings in Claude](https://docs.dataville.com/guides/underwrite-from-claude)
+- [Build a sector dataset in DuckDB from filings and your own notes](https://docs.dataville.com/guides/sector-dataset-duckdb)
+
+Reference: [Quickstart: API](https://docs.dataville.com/quickstart) · [Connect an AI tool](https://docs.dataville.com/ai-tools) · [Response format](https://docs.dataville.com/response-format) · [Query with SQL](https://docs.dataville.com/query-with-sql) · [Usage limits](https://docs.dataville.com/api-reference/usage-limits)
 
 ## Disclaimer
 
