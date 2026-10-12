@@ -4,7 +4,7 @@
 
 This repo shows how to use SEC EDGAR data through [Dataville](https://dataville.com): a 60-second API quickstart, an MCP example for agents, and a runnable filing analyzer with financials and risk scoring.
 
-[Get a free API key](https://app.dataville.com/api-keys) · [Docs](https://docs.dataville.com) · [API reference](https://docs.dataville.com/api-reference/overview) · [Dataville MCP](https://github.com/datavilleorg/dataville-mcp) · [Live demo](https://app.dataville.com/use-cases/sec-filing-analyzer)
+[Get a free API key](https://app.dataville.com/api-keys) · [Docs](https://docs.dataville.com) · [API reference](https://docs.dataville.com/api-reference/overview) · [Dataville MCP](https://github.com/datavilleorg/dataville-mcp) · [Live demo](https://app.dataville.com/use-cases/sec-filing-analyzer) · [All demos](https://app.dataville.com/demos)
 
 ```
 SEC EDGAR ──────────▶ Dataville ──────────────▶ one JSON response per company ──▶ your app
