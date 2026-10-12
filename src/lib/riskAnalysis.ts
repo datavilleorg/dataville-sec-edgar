@@ -122,15 +122,18 @@ function analyzeInsiderActivity(data: EdgarData): { score: number; signals: Risk
   const signals: RiskSignal[] = [];
   let score = 0;
 
-  const sales = transactions.filter((t: InsiderTransaction) => t.transactionCode === 'S');
-  const purchases = transactions.filter((t: InsiderTransaction) => t.transactionCode === 'P');
+  // Form 4 only says whether shares were disposed of (D) or acquired (A). A
+  // disposal is usually a sale; an acquisition may be a purchase, a grant or an
+  // option exercise.
+  const sales = transactions.filter((t: InsiderTransaction) => t.transactionCode === 'D');
+  const purchases = transactions.filter((t: InsiderTransaction) => t.transactionCode === 'A');
 
   if (sales.length > 0 && purchases.length === 0) {
     signals.push({
       category: 'insider',
       severity: 'medium',
-      title: 'Sell-only insider activity',
-      detail: `${sales.length} insider sale(s) with no purchases`,
+      title: 'Disposal-only insider activity',
+      detail: `${sales.length} insider disposal(s) with no acquisitions`,
     });
     score += 15;
   }
@@ -140,8 +143,8 @@ function analyzeInsiderActivity(data: EdgarData): { score: number; signals: Risk
     signals.push({
       category: 'insider',
       severity: 'high',
-      title: 'Multiple insiders selling',
-      detail: `${uniqueSellers.size} different insiders have sold shares`,
+      title: 'Multiple insiders disposing',
+      detail: `${uniqueSellers.size} different insiders have disposed of shares`,
     });
     score += 25;
   }
@@ -158,8 +161,8 @@ function analyzeInsiderActivity(data: EdgarData): { score: number; signals: Risk
     signals.push({
       category: 'insider',
       severity: 'high',
-      title: 'Large officer sale(s)',
-      detail: `${largeSales.length} sale(s) over $1M totaling $${(totalValue / 1e6).toFixed(1)}M`,
+      title: 'Large officer disposal(s)',
+      detail: `${largeSales.length} disposal(s) over $1M totaling $${(totalValue / 1e6).toFixed(1)}M`,
     });
     score += 20;
   }
@@ -168,8 +171,8 @@ function analyzeInsiderActivity(data: EdgarData): { score: number; signals: Risk
     signals.push({
       category: 'insider',
       severity: 'low',
-      title: 'Net insider buying',
-      detail: `${purchases.length} purchases vs ${sales.length} sales — generally a positive signal`,
+      title: 'Net insider acquisitions',
+      detail: `${purchases.length} acquisitions vs ${sales.length} disposals (acquisitions include grants and option exercises)`,
     });
     score = Math.max(0, score - 10);
   }

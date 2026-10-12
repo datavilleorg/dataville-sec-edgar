@@ -138,6 +138,15 @@ export default function EdgarAnalyzerPage() {
                   Explore Dataville API
                   <FiExternalLink className="h-3 w-3" />
                 </a>
+                <a
+                  href="https://app.dataville.com/api-keys"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="ml-4 inline-flex items-center gap-1 text-xs text-maroon hover:underline font-medium"
+                >
+                  Get a free API key
+                  <FiExternalLink className="h-3 w-3" />
+                </a>
               </div>
             </div>
           </div>
@@ -166,6 +175,9 @@ export default function EdgarAnalyzerPage() {
               </button>
             ))}
           </div>
+          {companies.find(c => c.ticker === selectedTicker)?.error && (
+            <p className="mt-3 text-sm text-red-700">{companies.find(c => c.ticker === selectedTicker)?.error}</p>
+          )}
         </div>
 
         {/* Filing Timeline */}

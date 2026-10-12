@@ -54,10 +54,17 @@ export default function CompanyFinancials({ data, isLoading }: CompanyFinancials
             );
           })}
 
-          {data.metadata?.filing_date && (
+          {financials?.form ? (
+            // The figures can come from an earlier 10-Q/10-K than the latest
+            // filing (an 8-K has none), so name the period they belong to.
             <p className="text-xs text-maroon/40 pt-2">
-              From {data.metadata.form_type} filed {data.metadata.filing_date}
+              From the {financials.form} for the period ending {financials.period}, filed {financials.filed} ·{' '}
+              <a href={data.metadata.document_url} target="_blank" rel="noopener noreferrer" className="underline">
+                latest filing
+              </a>
             </p>
+          ) : (
+            <p className="text-xs text-maroon/40 pt-2">No XBRL financials in this company&apos;s recent filings.</p>
           )}
         </div>
       )}

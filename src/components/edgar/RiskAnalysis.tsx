@@ -117,9 +117,9 @@ function Methodology() {
               <p className="mb-2">Derived from SEC Form 4 insider transaction filings:</p>
               <ul className="space-y-1.5">
                 {[
-                  ['Multiple insiders selling', '+25 pts', '3+ different insiders sold shares'],
-                  ['Large officer sale(s)', '+20 pts', 'Officer sale(s) exceeding $1M'],
-                  ['Sell-only activity', '+15 pts', 'Insider sales with no purchases'],
+                  ['Multiple insiders disposing', '+25 pts', '3+ different insiders disposed of shares'],
+                  ['Large officer disposal(s)', '+20 pts', 'Officer disposal(s) exceeding $1M'],
+                  ['Disposal-only activity', '+15 pts', 'Insider disposals with no acquisitions'],
                 ].map(([signal, pts, desc]) => (
                   <li key={signal} className="flex gap-2">
                     <span className="text-red-600 font-mono text-[10px] w-12 flex-shrink-0 text-right">{pts}</span>
@@ -127,7 +127,7 @@ function Methodology() {
                   </li>
                 ))}
                 {[
-                  ['Net insider buying', '-10 pts', 'More purchases than sales — positive signal'],
+                  ['Net insider acquisitions', '-10 pts', 'More acquisitions than disposals (incl. grants and exercises)'],
                 ].map(([signal, pts, desc]) => (
                   <li key={signal} className="flex gap-2">
                     <span className="text-green-600 font-mono text-[10px] w-12 flex-shrink-0 text-right">{pts}</span>
@@ -234,7 +234,7 @@ export default function RiskAnalysis({ data, companies, isLoading }: RiskAnalysi
     return computeRiskScore(data);
   }, [data]);
 
-  const companyName = data?.metadata?.company_info?.name || data?.entities?.[0] || 'Company';
+  const companyName = data?.metadata?.company_info?.name || data?.title || 'Company';
   const level = risk ? getRiskLevel(risk.overall) : null;
 
   return (

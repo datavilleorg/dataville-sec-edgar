@@ -12,6 +12,11 @@ export interface CompanyInfo {
 }
 
 export interface FinancialMetrics {
+  /** Which filing the figures come from; all figures share this one period. */
+  form?: string;
+  period_start?: string;
+  period?: string;
+  filed?: string;
   revenue?: string;
   gross_profit?: string;
   operating_income?: string;
@@ -22,35 +27,36 @@ export interface FinancialMetrics {
   cash?: string;
 }
 
+/**
+ * One insider trade from a Form 4. Form 4s say only whether shares were
+ * acquired (A) or disposed of (D); an acquisition may be a purchase, a grant
+ * or an option exercise, so the app doesn't call it a "buy".
+ */
 export interface InsiderTransaction {
   owner: string;
   isDirector: boolean;
   isOfficer: boolean;
   officerTitle: string;
   transactionDate: string;
-  transactionCode: string;
+  transactionCode: 'A' | 'D';
   sharesTraded: number;
   pricePerShare: number;
   sharesOwnedAfter: number;
 }
 
 export interface RecentFiling {
-  accessionNumber: string;
   formType: string;
   filingDate: string;
-  reportDate: string;
   description: string;
   documentUrl: string;
 }
 
+/** The app's view of one company, normalized from the Dataville response. */
 export interface EdgarData {
   id: string;
   title: string;
-  body: string;
   source: string;
-  language: string;
   last_updated: string;
-  entities: string[];
   metadata: {
     cik: string;
     form_type: string;
@@ -58,7 +64,7 @@ export interface EdgarData {
     report_date: string;
     accession_number: string;
     company_info: CompanyInfo;
-    financials: FinancialMetrics;
+    financials?: FinancialMetrics;
     insider_transactions: InsiderTransaction[];
     recent_filings: RecentFiling[];
     document_url: string;
@@ -67,15 +73,62 @@ export interface EdgarData {
   };
 }
 
-export interface DatavilleEdgarResponse {
-  status: string;
-  account_state: string;
-  data: EdgarData;
-  usage: {
-    requests_remaining: number;
-    request_limit: number;
+// ── Dataville API response: GET https://api.dataville.com/edgar/{query} ──────
+
+export interface DatavilleEdgarFiling {
+  id: string;
+  title: string;
+  source: string;
+  last_updated: string;
+  metadata: {
+    cik: string;
+    company_name: string;
+    form_type: string;
+    filing_date: string;
+    report_date: string;
+    accession_number: string;
+    document_url: string;
+    index_url: string;
+    xbrl_facts_url?: string;
+    sic?: string;
+    sic_description?: string;
+    industry?: string;
+    state_of_incorporation?: string;
+    exchanges?: string[];
+    tickers?: string[];
+    category?: string;
+    fiscal_year_end?: string;
+    financials?: FinancialMetrics;
+    recent_filings?: Array<{ form: string; date: string; description: string; url: string }>;
+    insider_transactions?: Array<{
+      filing_date: string;
+      owner_name: string;
+      owner_role: string;
+      transactions: Array<{
+        security: string;
+        date: string;
+        shares: number;
+        price_per_share: number | null;
+        type: 'buy' | 'sell';
+        shares_owned_after: number | null;
+      }>;
+    }>;
   };
 }
+
+export interface DatavilleEdgarResponse {
+  status: 'success';
+  account_state: string;
+  data: DatavilleEdgarFiling;
+}
+
+export interface DatavilleErrorResponse {
+  status: string;
+  data?: { error: string; code: string };
+  message?: string;
+}
+
+export type EdgarResult = { data: EdgarData } | { error: string };
 
 export interface CompanyEntry {
   ticker: string;
