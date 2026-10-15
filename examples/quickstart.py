@@ -37,7 +37,7 @@ print(filing["title"])
 print(f"CIK {meta['cik']} · {', '.join(meta.get('tickers') or [])} · {meta.get('industry')}\n")
 if fin:
     print(f"Financials ({fin['form']}, period ending {fin['period']}, filed {fin['filed']}):")
-    for label in ("revenue", "net_income", "total_assets", "cash", "eps_diluted"):
+    for label in ("revenue", "net_income", "total_assets", "cash", "capex", "eps_diluted"):
         if fin.get(label):
             print(f"  {label.replace('_', ' ').capitalize():<14}{fin[label]}")
 print("\nFiling:  ", meta["document_url"])

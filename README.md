@@ -132,6 +132,7 @@ SEC EDGAR holds what companies **officially disclosed to the regulator**: the pr
         "revenue": "$364.36B",
         "net_income": "$101.46B",
         "total_assets": "$383.27B",
+        "capex": "$6.80B",
         "eps_diluted": "$6.88"
       },
       "recent_filings": [
@@ -144,7 +145,7 @@ SEC EDGAR holds what companies **officially disclosed to the regulator**: the pr
 
 The response also includes `insider_transactions` (parsed Form 4 filings) when the company has recent ones.
 
-**2. Get the latest financials.** Read `metadata.financials`. Every figure comes from the same reporting period, named by `form`, `period_start`, `period` and `filed`. If the latest filing is an 8-K, which has no financials of its own, the figures come from the most recent 10-K or 10-Q, and these fields say which one.
+**2. Get the latest financials.** Read `metadata.financials`. Every figure comes from the same reporting period, named by `form`, `period_start`, `period` and `filed`. On a 10-Q, flow figures such as `revenue` and `capex` cover the fiscal year to date, not the quarter alone. If the latest filing is an 8-K, which has no financials of its own, the figures come from the most recent 10-K or 10-Q, and these fields say which one.
 
 **3. Watch for new disclosures.** Poll `GET /edgar/{ticker}` for a watchlist and compare `metadata.recent_filings` with what you saw last time. A new `8-K` means a material event; a new `4` means an insider trade.
 

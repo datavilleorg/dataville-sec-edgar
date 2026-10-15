@@ -28,7 +28,7 @@ console.log(filing.title);
 console.log(`CIK ${meta.cik} · ${(meta.tickers ?? []).join(", ")} · ${meta.industry}\n`);
 if (fin.form) {
   console.log(`Financials (${fin.form}, period ending ${fin.period}, filed ${fin.filed}):`);
-  for (const k of ["revenue", "net_income", "total_assets", "cash", "eps_diluted"]) {
+  for (const k of ["revenue", "net_income", "total_assets", "cash", "capex", "eps_diluted"]) {
     if (fin[k]) console.log(`  ${k.replace("_", " ").padEnd(14)}${fin[k]}`);
   }
 }
