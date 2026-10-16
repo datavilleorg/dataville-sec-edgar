@@ -17,6 +17,7 @@ const METRIC_LABELS: { key: keyof FinancialMetrics; label: string }[] = [
   { key: 'total_liabilities', label: 'Total Liabilities' },
   { key: 'stockholders_equity', label: "Stockholders' Equity" },
   { key: 'cash', label: 'Cash' },
+  { key: 'capex', label: 'Capital Expenditures' },
 ];
 
 export default function CompanyFinancials({ data, isLoading }: CompanyFinancialsProps) {

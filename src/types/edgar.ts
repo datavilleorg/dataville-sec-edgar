@@ -25,6 +25,13 @@ export interface FinancialMetrics {
   total_liabilities?: string;
   stockholders_equity?: string;
   cash?: string;
+  long_term_debt?: string;
+  rd_expense?: string;
+  /** Payments for property, plant and equipment, for the same period as revenue. */
+  capex?: string;
+  eps_basic?: string;
+  eps_diluted?: string;
+  shares_outstanding?: string;
 }
 
 /**
