@@ -58,6 +58,14 @@ export interface RecentFiling {
   documentUrl: string;
 }
 
+/** An amendment (10-K/A, 8-K/A, ...) filed later for the company's latest filing. */
+export interface Amendment {
+  formType: string;
+  filingDate: string;
+  accessionNumber: string;
+  documentUrl: string;
+}
+
 /** The app's view of one company, normalized from the Dataville response. */
 export interface EdgarData {
   id: string;
@@ -74,6 +82,8 @@ export interface EdgarData {
     financials?: FinancialMetrics;
     insider_transactions: InsiderTransaction[];
     recent_filings: RecentFiling[];
+    /** Newest first; empty when the filing hasn't been amended. */
+    amended_by: Amendment[];
     document_url: string;
     filing_index: string;
     xbrl_facts: string;
@@ -107,6 +117,8 @@ export interface DatavilleEdgarFiling {
     fiscal_year_end?: string;
     financials?: FinancialMetrics;
     recent_filings?: Array<{ form: string; date: string; description: string; url: string }>;
+    /** Amendments of this filing, newest first. Left out when there are none. */
+    amended_by?: Array<{ form: string; filing_date: string; accession_number: string; document_url: string }>;
     insider_transactions?: Array<{
       filing_date: string;
       owner_name: string;

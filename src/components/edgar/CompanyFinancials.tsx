@@ -67,6 +67,22 @@ export default function CompanyFinancials({ data, isLoading }: CompanyFinancials
           ) : (
             <p className="text-xs text-maroon/40 pt-2">No XBRL financials in this company&apos;s recent filings.</p>
           )}
+
+          {data.metadata.amended_by.length > 0 && (
+            // Most 10-K/As add Part III or exhibits rather than restate the
+            // figures, so link each amendment instead of guessing what changed.
+            <p className="text-xs text-maroon/40">
+              Latest filing amended by{' '}
+              {data.metadata.amended_by.map((amendment, i) => (
+                <span key={amendment.accessionNumber}>
+                  {i > 0 && ', '}
+                  <a href={amendment.documentUrl} target="_blank" rel="noopener noreferrer" className="underline">
+                    {amendment.formType} filed {amendment.filingDate}
+                  </a>
+                </span>
+              ))}
+            </p>
+          )}
         </div>
       )}
     </div>
