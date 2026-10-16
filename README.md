@@ -28,19 +28,30 @@ curl "https://api.dataville.com/edgar/AAPL" \
 
 A ticker (`AAPL`), a company name (`JPMorgan Chase`) or a phrase (`Apple revenue`) all resolve to the company.
 
+To get the latest filing of one form, such as the annual report, add `form_type`:
+
+```bash
+curl "https://api.dataville.com/edgar/AAPL?form_type=10-K" \
+  -H "Authorization: Bearer $DATAVILLE_API_KEY"
+```
+
+`form_type` accepts `10-K`, `10-Q`, `8-K`, `20-F`, `S-1` and `DEF 14A`, and the amendments `10-K/A`, `10-Q/A`, `8-K/A`, `20-F/A` and `S-1/A`. A form named in the query works too (`AAPL 10-K`). If the company has no filing of that form, you get a 404 that lists the forms it does file, and you aren't charged.
+
 ### Python (standard library only)
 
 ```bash
 python examples/quickstart.py AAPL
+python examples/quickstart.py AAPL 10-K
 ```
 
 ### JavaScript / TypeScript (Node 18+, no dependencies)
 
 ```bash
 node examples/quickstart.mjs AAPL
+node examples/quickstart.mjs AAPL 10-K
 ```
 
-Both print the same thing:
+Both print the same thing. For `AAPL`:
 
 ```
 Apple Inc. — 10-Q (2026-07-31)
@@ -51,10 +62,26 @@ Financials (10-Q, period ending 2026-06-27, filed 2026-07-31):
   Net income    $101.46B
   Total assets  $383.27B
   Cash          $39.54B
+  Capex         $6.80B
+  Eps diluted   $6.88
 
 Filing:   https://www.sec.gov/Archives/edgar/data/320193/000032019326000020/aapl-20260627.htm
-Recent:   4 (2026-10-08), 4 (2026-10-05), 4 (2026-10-05), ...
+Recent:   4 (2026-10-15), 4 (2026-10-08), 4 (2026-10-05), ...
 ```
+
+With `10-K`, the filing and its financials are Apple's latest annual report, covering the full fiscal year:
+
+```
+Apple Inc. — 10-K (2025-10-31)
+CIK 0000320193 · AAPL · Electronic Computers (SIC 3571)
+
+Financials (10-K, period ending 2025-09-27, filed 2025-10-31):
+  Revenue       $416.16B
+  Net income    $112.01B
+  ...
+```
+
+If the filing has been amended, an `Amended:` line lists the amendments. Try `SEER 10-K`, which prints `Amended:  10-K/A (2026-04-30)`.
 
 ### MCP (Claude, Cursor, VS Code, any MCP client)
 
@@ -86,7 +113,7 @@ If you're writing Python against EDGAR alone, [EdgarTools](https://github.com/dg
 
 ## Authoritative, primary-source data
 
-SEC EDGAR holds what companies **officially disclosed to the regulator**: the primary source for their financials, material events, ownership and governance. That makes it authoritative in a way secondary sources aren't. It is still the company's own statement, though: quarterly (10-Q) figures are unaudited, and filings can be amended later. Dataville keeps each figure tied to its form, period and filing, so your application can say exactly where a number came from.
+SEC EDGAR holds what companies **officially disclosed to the regulator**: the primary source for their financials, material events, ownership and governance. That makes it authoritative in a way secondary sources aren't. It is still the company's own statement, though: quarterly (10-Q) figures are unaudited, and filings can be amended later. Dataville keeps each figure tied to its form, period and filing, so your application can say exactly where a number came from, and `metadata.amended_by` lists any amendments filed for the filing it returns.
 
 ## Dataset card
 
@@ -94,7 +121,7 @@ SEC EDGAR holds what companies **officially disclosed to the regulator**: the pr
 |---|---|
 | **Source** | SEC EDGAR (U.S. Securities and Exchange Commission) |
 | **Provider** | SEC public APIs (`data.sec.gov`), via Dataville |
-| **Coverage** | SEC registrants. The "latest filing" is the most recent 10-K, 10-Q, 8-K, 20-F, S-1 or DEF 14A |
+| **Coverage** | SEC registrants. The "latest filing" is the most recent 10-K, 10-Q, 8-K, 20-F, S-1 or DEF 14A, or the most recent of one form with `form_type` |
 | **Freshness** | Fetched from the SEC on request and cached for up to 30 minutes |
 | **Financials** | XBRL facts aligned to one reporting period, labelled with its form, period and filing date; values are formatted strings (e.g. `"$364.36B"`) |
 | **Provenance** | `metadata.document_url` (filing), `accession_number`, `cik`, `index_url`, `xbrl_facts_url` |

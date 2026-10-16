@@ -77,6 +77,12 @@ export function toEdgarData(filing: DatavilleEdgarFiling): EdgarData {
         description: f.description,
         documentUrl: f.url,
       })),
+      amended_by: (m.amended_by ?? []).map(a => ({
+        formType: a.form,
+        filingDate: a.filing_date,
+        accessionNumber: a.accession_number,
+        documentUrl: a.document_url,
+      })),
       document_url: m.document_url,
       filing_index: m.index_url,
       xbrl_facts: m.xbrl_facts_url ?? '',
